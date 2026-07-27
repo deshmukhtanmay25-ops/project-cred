@@ -1,0 +1,29 @@
+Limitations & Data-Quality Note
+
+This note goes deeper than the README's summary — it's the honest version: what was actually wrong with the data, what was done about it, what's still imperfect, and where the model breaks.
+
+Data quality: what was wrong, and what was done
+
+Multi-level, inconsistent headers. Every raw NPCI file arrives with a two-row header and merged cells that pandas doesn't parse cleanly on its own. This was handled with header=[0,1] and a flattening step that drops Unnamed sub-headers — but that flattening logic assumes every monthly file follows the same header shape. It wasn't verified against every single month; a file with a structurally different header could silently produce wrong or missing columns rather than an error.
+
+App names were not consistent across months. The same app appeared under multiple spellings ("Phone Pe" vs "PhonePe"), multiple cases ("Fampay" vs "FamApp by Trio" vs "FAM"), and with stray characters (# suffixes, extra parentheses). This was fixed in two passes: a manual name_map for known variants, then a case-insensitive grouping pass to catch anything the manual map missed. What remains imperfect: the manual map only catches variants that were actually spotted by eye. A newly-rebranded or newly-listed app with a name variant that wasn't checked could still be double-counted as two apps rather than one, and there's no automated check that would catch this going forward — only the two passes already run.
+
+Numeric fields needed coercion. Volume and value columns contained thousand-separator commas and were read in as strings, not numbers. These were stripped and coerced with pd.to_numeric(errors='coerce'), and the notebook confirms zero rows became NaN after conversion — but "zero NaN" only proves nothing was unparseable, not that every value was correct. A typo like a misplaced decimal (e.g. 1234.5 entered as 12345) would convert cleanly and pass this check while still being wrong.
+
+Reproducibility gap between the early exploration and the final dataset. The early cells in the notebook process 7 monthly files (Jan–Jul 2025) into data.csv. The SQL and modeling steps later in the notebook query a database covering 24 months (Jan 2024–Dec 2025). The notebook as it stands doesn't show the step that assembled the full 24-month database — meaning someone re-running the notebook top to bottom from the 7 files shown would not reproduce the results reported later. This is worth fixing before submission: either show the full 24-month assembly step, or clearly separate "exploration on 7 months" from "final pipeline on 24 months" so a reader isn't misled about what produced the reported numbers.
+
+The "Others" bucket hides real structure. Smaller apps are aggregated into a catch-all category by NPCI's own reporting, not by this pipeline's choice. That means the true number of active UPI apps, and how volume is distributed among the smallest players, is understated — the concentration finding is likely even more extreme than what's directly visible, since "Others" itself might contain dozens of apps each with negligible share.
+
+Model: where it breaks, why, and what would fix it
+
+The model only knows time — nothing else. It's a linear regression on a monthly index against total ecosystem volume. It has no features for seasonality, festive-month spikes, pricing changes, new entrant launches, or regulatory action (like NPCI's market-share cap discussions). Any of those would move actual volume without the model having any way to see it coming.
+
+Where it breaks: an R² of 0.656 and a test MAE of ~346 million transactions (against a total that ranges roughly 12,000–21,000 million) means the model is missing a meaningful share of month-to-month movement — it captures the overall upward trend but not the bumps around it. A single linear trend also implicitly assumes growth continues at a constant rate indefinitely, which is not a safe assumption this far out; UPI's growth rate has itself likely been slowing or shifting as the market matures, and a straight line can't represent that.
+
+The test set is small. Only 5 months of held-out data back the reported R² and MAE. With that few points, both numbers are unstable — a different 5-month window could shift them meaningfully. This should be read as a rough estimate of model quality, not a precise one.
+
+What data would fix it: more months of history (ideally spanning multiple full years, to let the model see and adjust for seasonality); event flags for known market-moving actions (major pricing or policy changes, large entrant launches); and app-level or segment-level modeling rather than one aggregate series, since the concentration finding suggests the top 2–3 apps and the long tail may be growing at genuinely different rates that an aggregate trend line averages away.
+
+The honest summary
+
+The pipeline is solid enough to support the headline finding — concentration, not broadening — because that conclusion rests on a simple ranking of cumulative volume, which is robust to the smaller cleaning imperfections above. The growth projection, however, is the weaker part of this project: it's a reasonable trend estimate with real, quantified uncertainty, not a forecast anyone should rely on for a specific number.
