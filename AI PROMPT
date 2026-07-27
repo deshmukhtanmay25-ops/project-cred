@@ -1,0 +1,23 @@
+ AI Workflow Appendix
+
+*Drafted from the trail of edits visible in `project.ipynb` — the re-runs, split changes, and cleanup passes in the notebook mirror the debugging path below. Review and adjust the specifics against what actually happened before submitting; this is a best-effort reconstruction, not a memory of your prompts.*
+
+## Where AI helped
+
+- **Parsing NPCI's multi-level Excel headers.** The raw files use a two-row header (`Customer Initiated Transactions` / `Volume (Mn)` / `Value (Cr)`) that pandas doesn't flatten automatically. AI assistance was useful for the `header=[0,1]` multi-index read and the column-flattening logic that drops the `Unnamed` sub-headers.
+- **Building the app-name cleaning pass.** Reconciling 91 raw app-name spellings into 90 canonical ones (e.g. "Phone Pe" → "PhonePe", the Fampay/FamApp/FAM cluster) was drafted with AI help and then corrected by hand against what actually appeared in the data.
+- **The SQL window-function query.** The `SUM(volume_mn) OVER (PARTITION BY month)` market-share query was scaffolded with AI help, then adapted to the actual `app_monthly` schema.
+
+## A moment it was confidently wrong
+
+The first pass at deduplicating app names used only the manual `name_map` dictionary and was treated as complete — confidently reported as "90 unique apps" without checking for names that differed only in capitalization (e.g. two entries that are the same app but cased differently would count as two apps). That check (`case_dupes` in the notebook) was added afterward specifically because the first pass looked clean but wasn't: it caught duplicates the manual map had no way of seeing since it matched on exact string, not on case-insensitive identity.
+
+**How it was caught:** by explicitly grouping app names by their lowercased form and checking for any group with more than one distinct original spelling — a check that isn't obvious to run unless you're specifically suspicious of the "looks done" output. The lesson: a cleaning step that "runs without errors and produces a clean-looking count" is not the same as a cleaning step that's actually correct.
+
+## Where I trusted AI vs. where I didn't
+
+- **Trusted:** boilerplate — file-glob logic, header-flattening, standard pandas/sklearn syntax (`LinearRegression`, `mean_absolute_error`, `train_test_split` logic). These are low-risk, easily verified by checking the output shape.
+- **Did not trust blindly:** anything touching the actual analytical judgment calls — which train/test split ratio to use for a 24-month trend (the notebook shows this was revisited, moving from a 70/30 to an 80/20 split), which app-name variants are genuinely the same brand, and what the R²/MAE numbers actually imply about the model's usefulness. Those required checking the data itself, not just accepting a plausible-sounding suggestion.
+
+---
+*Fill in / correct: the actual tool(s) used, and swap in your own memory of what happened if it differs from the reconstruction above — a hiring manager reading this appendix is checking that it's true and specific to your process, not just plausible.*
