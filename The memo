@@ -1,0 +1,26 @@
+Memo: UPI Market Structure — Implications for CRED's Growth Strategy
+
+To: CRED Strategy Team Re: Is UPI's growth broadening across apps, or concentrating? What that means for our UPI play. Data: NPCI monthly Ecosystem Statistics, Jan 2024 – Dec 2025 (24 months, ~90 apps)
+
+Bottom line
+
+UPI's transaction volume is growing steadily — roughly 12,300 million to 21,100 million monthly transactions over the last 24 months — but that growth is not spreading across apps. It's concentrating. PhonePe and Google Pay alone account for the overwhelming majority of cumulative volume; every other app, including CRED, is splitting a thin remainder. CRED's own UPI share has hovered near 1% and has drifted slightly down, not up, over the period observed.
+
+The evidence
+Cumulative volume, top apps (24-month total): PhonePe ≈58,900M, Google Pay ≈45,300M, Paytm ≈8,600M, Navi ≈2,400M, super.money ≈1,300M, CRED ≈970M.
+Two apps hold a combined share that dwarfs the next eight apps put together.
+CRED's monthly share sat around 1.0–1.1% through the observed period, with a slight downward drift rather than gains — even as the total market grew.
+A linear trend model on total monthly volume shows continued overall growth (~369M additional transactions/month) with moderate confidence (R² = 0.66 on held-out months) — the market isn't slowing, it's just not redistributing.
+What this means for CRED
+
+A market-share war against PhonePe and Google Pay on their terms — plain UPI payments — is not a fight worth picking. Their lead is not a temporary artifact of the data window; it's structural, and the trend shows no sign of narrowing. Competing head-on for generic UPI transaction share would mean spending heavily against two entrenched, subsidized incumbents for a share that's currently shrinking, not growing.
+
+The opportunity is in where UPI usage is undifferentiated. Since the two leaders win on ubiquity and habit, CRED's UPI play is stronger where it's tied to something PhonePe and Google Pay don't offer well: bill payments, rent, and credit-adjacent transactions bundled into CRED's existing credit-card and rewards ecosystem, rather than as a standalone wallet.
+
+Recommendation
+Do not fund a broad UPI market-share campaign. The data doesn't support that this is winnable at reasonable cost within the current structure.
+Concentrate UPI investment on CRED's existing user base and their highest-frequency, highest-value use cases (rent, bill pay, large-ticket spends) where CRED's rewards and credit tie-ins are a real differentiator PhonePe/Google Pay don't match.
+Track CRED's share on a rolling basis, not just cumulative volume. A slight downward drift in share, even during overall market growth, is an early signal worth monitoring quarterly rather than discovering a year from now.
+Trade-offs and what we don't know
+
+This recommendation trades broad-reach growth for narrower, defensible growth — it will not move CRED's raw UPI volume rank, and it accepts that. It also rests on 24 months of aggregate data with no visibility into why PhonePe/Google Pay retain share (habit, merchant integrations, cashback intensity are all plausible but untested here). Before committing significant budget, a focused look at CRED's own user cohort's UPI behavior — not just the market-wide numbers — would sharpen this further.
